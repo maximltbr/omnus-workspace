@@ -96,6 +96,49 @@ export default function DatasetDetails() {
         </Card>
       </div>
 
+      {/* Data Table */}
+      {dataset.data && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Data</CardTitle>
+            <CardDescription>
+              {dataset.data.rowCount} rows × {dataset.data.headers.length} columns
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-lg border border-border overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-table-header border-b border-table-border">
+                      {dataset.data.headers.map((header, i) => (
+                        <th key={i} className="px-4 py-3 text-left font-medium">
+                          {header}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dataset.data.rows.map((row, i) => (
+                      <tr 
+                        key={i} 
+                        className="border-b border-table-border hover:bg-table-hover transition-colors"
+                      >
+                        {row.map((cell, j) => (
+                          <td key={j} className="px-4 py-3">
+                            {cell}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Schema */}
       <Card>
         <CardHeader>
@@ -104,9 +147,20 @@ export default function DatasetDetails() {
         </CardHeader>
         <CardContent>
           <div className="rounded-lg border border-border bg-muted/30 p-4">
-            <p className="text-sm text-muted-foreground">
-              Schema preview would appear here with column names, types, and sample data
-            </p>
+            {dataset.data ? (
+              <div className="space-y-2">
+                {dataset.data.headers.map((header, i) => (
+                  <div key={i} className="flex items-center justify-between text-sm">
+                    <span className="font-medium">{header}</span>
+                    <span className="text-muted-foreground">string</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Schema preview would appear here with column names, types, and sample data
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>

@@ -29,6 +29,11 @@ export interface Dataset {
   };
   restricted: boolean;
   environment: Environment;
+  data?: {
+    headers: string[];
+    rows: any[][];
+    rowCount: number;
+  };
 }
 
 export interface PageNode {

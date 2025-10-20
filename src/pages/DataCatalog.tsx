@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { CreateDatasetDialog } from '@/components/data/CreateDatasetDialog';
+import { AddDataPopover } from '@/components/data/AddDataPopover';
 import { DataTable } from '@/components/data/DataTable';
 import { useDataStore } from '@/stores/useDataStore';
 import { toast } from 'sonner';
@@ -12,7 +12,7 @@ export default function DataCatalog() {
     deleteDataset,
     updateDataset
   } = useDataStore();
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [popoverOpen, setPopoverOpen] = useState(false);
   const handleDelete = (id: string, name: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (confirm(`Delete dataset "${name}"?`)) {
@@ -41,7 +41,7 @@ export default function DataCatalog() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Data</h1>
-        <CreateDatasetDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+        <AddDataPopover open={popoverOpen} onOpenChange={setPopoverOpen}>
           <Button variant="ghost" className="text-primary hover:text-primary">
             <svg className="h-4 w-4 mr-1" viewBox="0 0 18.3398 17.9785" fill="none">
               <path d="M3.06641 17.9785L14.9121 17.9785C16.9629 17.9785 17.9785 16.9727 17.9785 14.9609L17.9785 3.02734C17.9785 1.01562 16.9629 0 14.9121 0L3.06641 0C1.02539 0 0 1.01562 0 3.02734L0 14.9609C0 16.9727 1.02539 17.9785 3.06641 17.9785ZM3.08594 16.4062C2.10938 16.4062 1.57227 15.8887 1.57227 14.873L1.57227 3.11523C1.57227 2.09961 2.10938 1.57227 3.08594 1.57227L14.8926 1.57227C15.8594 1.57227 16.4062 2.09961 16.4062 3.11523L16.4062 14.873C16.4062 15.8887 15.8594 16.4062 14.8926 16.4062Z" fill="currentColor" fillOpacity="0.85" />
@@ -49,7 +49,7 @@ export default function DataCatalog() {
             </svg>
             Add data
           </Button>
-        </CreateDatasetDialog>
+        </AddDataPopover>
       </div>
 
       {/* Data Table */}
