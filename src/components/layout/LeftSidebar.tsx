@@ -30,9 +30,7 @@ export function LeftSidebar() {
         <div className="p-3 space-y-4">
           {/* Spaces Section */}
           <div>
-            <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 px-2">
-              Spaces
-            </h3>
+            
             <SpacesTree />
           </div>
 
