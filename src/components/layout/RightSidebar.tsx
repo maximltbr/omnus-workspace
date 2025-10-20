@@ -17,7 +17,7 @@ export function RightSidebar() {
           
           
         </div>
-        <Button variant="ghost" size="icon" onClick={toggleRightPin} className={`h-7 w-7 pin-button ${rightPinned ? 'text-primary' : 'text-muted-foreground'}`} title="Pin assistant (P)">
+        <Button variant="ghost" size="icon" onClick={toggleRightPin} className="h-7 w-7 pin-button text-foreground" title="Pin assistant (P)">
           <svg className="h-4 w-4" viewBox="0 0 23.3887 17.9785" xmlns="http://www.w3.org/2000/svg">
             <g>
               <rect height="17.9785" opacity="0" width="23.3887" x="0" y="0" />
