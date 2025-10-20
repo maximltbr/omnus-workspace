@@ -9,6 +9,10 @@ interface DataStore {
   addPage: (spaceId: ID, folderId: ID, name: string) => void;
   getSpace: (id: ID) => SpaceNode | undefined;
   getPage: (id: ID) => { space: SpaceNode; folder: any; page: any } | undefined;
+  addDataset: (dataset: Omit<Dataset, 'id' | 'audit'>) => void;
+  updateDataset: (id: ID, updates: Partial<Dataset>) => void;
+  deleteDataset: (id: ID) => void;
+  getDataset: (id: ID) => Dataset | undefined;
 }
 
 // Mock data for demo
@@ -168,4 +172,42 @@ export const useDataStore = create<DataStore>((set, get) => ({
     }
     return undefined;
   },
+  
+  addDataset: (dataset) => {
+    const newDataset: Dataset = {
+      ...dataset,
+      id: `ds-${Date.now()}`,
+      audit: {
+        updatedAt: new Date().toISOString(),
+        updatedBy: 'current-user@company.com',
+      },
+    };
+    set((state) => ({ datasets: [...state.datasets, newDataset] }));
+  },
+  
+  updateDataset: (id, updates) => {
+    set((state) => ({
+      datasets: state.datasets.map((ds) =>
+        ds.id === id
+          ? {
+              ...ds,
+              ...updates,
+              audit: {
+                ...ds.audit,
+                updatedAt: new Date().toISOString(),
+                updatedBy: 'current-user@company.com',
+              },
+            }
+          : ds
+      ),
+    }));
+  },
+  
+  deleteDataset: (id) => {
+    set((state) => ({
+      datasets: state.datasets.filter((ds) => ds.id !== id),
+    }));
+  },
+  
+  getDataset: (id) => get().datasets.find((ds) => ds.id === id),
 }));

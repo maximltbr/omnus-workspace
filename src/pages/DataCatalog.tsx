@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Database, Upload, MoreVertical, Lock, Zap, AlertCircle, CheckCircle } from 'lucide-react';
+import { Database, MoreVertical, Lock, Zap, AlertCircle, CheckCircle, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -16,24 +16,59 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { CreateDatasetDialog } from '@/components/data/CreateDatasetDialog';
+import { UploadDataDialog } from '@/components/data/UploadDataDialog';
+import { DataTable } from '@/components/data/DataTable';
 import { useDataStore } from '@/stores/useDataStore';
-import type { Dataset } from '@/types';
+import { toast } from 'sonner';
+import type { Dataset, Environment } from '@/types';
 
 export default function DataCatalog() {
   const navigate = useNavigate();
-  const { datasets } = useDataStore();
+  const { datasets, deleteDataset, updateDataset } = useDataStore();
   const [search, setSearch] = useState('');
-  const [sourceFilter, setSourceFilter] = useState<string | null>(null);
+  const [activeEnv, setActiveEnv] = useState<Environment | 'all'>('all');
+
+  const environments: (Environment | 'all')[] = ['all', 'CRM', 'ERP', 'Headcount', 'BI'];
 
   const filteredDatasets = datasets.filter((ds) => {
     const matchesSearch = ds.name.toLowerCase().includes(search.toLowerCase());
-    const matchesSource = !sourceFilter || ds.source === sourceFilter;
-    return matchesSearch && matchesSource;
+    const matchesEnv = activeEnv === 'all' || ds.environment === activeEnv;
+    return matchesSearch && matchesEnv;
   });
 
-  const sources = Array.from(new Set(datasets.map((ds) => ds.source)));
+  const groupedDatasets = filteredDatasets.reduce((acc, ds) => {
+    const env = ds.environment;
+    if (!acc[env]) acc[env] = [];
+    acc[env].push(ds);
+    return acc;
+  }, {} as Record<string, Dataset[]>);
+
+  const handleDelete = (id: string, name: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirm(`Delete dataset "${name}"?`)) {
+      deleteDataset(id);
+      toast.success('Dataset deleted');
+    }
+  };
+
+  const toggleAutomation = (id: string, enabled: boolean, e: React.MouseEvent) => {
+    e.stopPropagation();
+    updateDataset(id, {
+      automation: { enabled: !enabled, status: 'ok' },
+    });
+    toast.success(enabled ? 'Automation disabled' : 'Automation enabled');
+  };
+
+  const toggleRestricted = (id: string, restricted: boolean, e: React.MouseEvent) => {
+    e.stopPropagation();
+    updateDataset(id, { restricted: !restricted });
+    toast.success(restricted ? 'Access opened' : 'Access restricted');
+  };
 
   const getStatusIcon = (status: Dataset['automation']['status']) => {
     switch (status) {
@@ -59,108 +94,72 @@ export default function DataCatalog() {
             Manage and view all connected data sources
           </p>
         </div>
-        <Button>
-          <Upload className="h-4 w-4 mr-2" />
-          Upload Dataset
-        </Button>
-      </div>
-
-      {/* Filters */}
-      <div className="flex gap-3">
-        <Input
-          placeholder="Search datasets..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="max-w-xs"
-        />
         <div className="flex gap-2">
-          <Button
-            variant={sourceFilter === null ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setSourceFilter(null)}
-          >
-            All Sources
-          </Button>
-          {sources.map((source) => (
-            <Button
-              key={source}
-              variant={sourceFilter === source ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setSourceFilter(source)}
-            >
-              {source}
-            </Button>
-          ))}
+          <UploadDataDialog />
+          <CreateDatasetDialog />
         </div>
       </div>
 
-      {/* Table */}
-      <div className="rounded-lg border border-table-border bg-card shadow-sm overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-table-header hover:bg-table-header">
-              <TableHead className="font-semibold">Name</TableHead>
-              <TableHead className="font-semibold">Source</TableHead>
-              <TableHead className="font-semibold">Type</TableHead>
-              <TableHead className="font-semibold">Environment</TableHead>
-              <TableHead className="font-semibold">Automation</TableHead>
-              <TableHead className="font-semibold">Last Updated</TableHead>
-              <TableHead className="w-12"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredDatasets.map((dataset) => (
-              <TableRow
-                key={dataset.id}
-                className="cursor-pointer hover:bg-table-hover transition-colors"
-                onClick={() => navigate(`/data/${dataset.id}`)}
-              >
-                <TableCell className="font-medium">
-                  <div className="flex items-center gap-2">
-                    {dataset.name}
-                    {dataset.restricted && <Lock className="h-3.5 w-3.5 text-muted-foreground" />}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline">{dataset.source}</Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={dataset.type === 'snapshot' ? 'secondary' : 'default'}>
-                    {dataset.type}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm text-muted-foreground">{dataset.environment}</span>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    {dataset.automation.enabled && <Zap className="h-4 w-4 text-primary" />}
-                    {getStatusIcon(dataset.automation.status)}
-                  </div>
-                </TableCell>
-                <TableCell className="text-sm text-muted-foreground">
-                  {new Date(dataset.audit.updatedAt).toLocaleDateString()}
-                </TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-popover">
-                      <DropdownMenuItem>Rename</DropdownMenuItem>
-                      <DropdownMenuItem>Change Type</DropdownMenuItem>
-                      <DropdownMenuItem>Manage Permissions</DropdownMenuItem>
-                      <DropdownMenuItem>View Audit Log</DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
+      {/* Search & Filters */}
+      <div className="flex items-center gap-4">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search datasets..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <Tabs value={activeEnv} onValueChange={(v) => setActiveEnv(v as Environment | 'all')}>
+          <TabsList>
+            {environments.map((env) => (
+              <TabsTrigger key={env} value={env} className="capitalize">
+                {env === 'all' ? 'All' : env}
+              </TabsTrigger>
             ))}
-          </TableBody>
-        </Table>
+          </TabsList>
+        </Tabs>
+      </div>
+
+      {/* Grouped Tables by Environment */}
+      <div className="space-y-6">
+        {activeEnv === 'all' ? (
+          // Show grouped by environment
+          Object.entries(groupedDatasets).map(([env, envDatasets]) => (
+            <div key={env} className="space-y-3">
+              <div className="flex items-center gap-2">
+                <h2 className="text-xl font-semibold">{env}</h2>
+                <Badge variant="secondary">{envDatasets.length}</Badge>
+              </div>
+              <DataTable
+                datasets={envDatasets}
+                navigate={navigate}
+                getStatusIcon={getStatusIcon}
+                handleDelete={handleDelete}
+                toggleAutomation={toggleAutomation}
+                toggleRestricted={toggleRestricted}
+              />
+            </div>
+          ))
+        ) : (
+          // Show single environment
+          <DataTable
+            datasets={filteredDatasets}
+            navigate={navigate}
+            getStatusIcon={getStatusIcon}
+            handleDelete={handleDelete}
+            toggleAutomation={toggleAutomation}
+            toggleRestricted={toggleRestricted}
+          />
+        )}
+        
+        {filteredDatasets.length === 0 && (
+          <div className="text-center py-12 text-muted-foreground">
+            <Database className="h-12 w-12 mx-auto mb-3 opacity-20" />
+            <p>No datasets found</p>
+          </div>
+        )}
       </div>
     </div>
   );
