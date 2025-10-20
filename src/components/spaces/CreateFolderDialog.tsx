@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { FolderPlus } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -8,7 +7,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,12 +16,19 @@ import { toast } from 'sonner';
 interface CreateFolderDialogProps {
   spaceId: string;
   spaceName: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function CreateFolderDialog({ spaceId, spaceName }: CreateFolderDialogProps) {
-  const [open, setOpen] = useState(false);
+export function CreateFolderDialog({ spaceId, spaceName, open, onOpenChange }: CreateFolderDialogProps) {
   const [name, setName] = useState('');
   const { addFolder } = useDataStore();
+
+  useEffect(() => {
+    if (!open) {
+      setName('');
+    }
+  }, [open]);
 
   const handleCreate = () => {
     if (!name.trim()) {
@@ -33,18 +38,11 @@ export function CreateFolderDialog({ spaceId, spaceName }: CreateFolderDialogPro
 
     addFolder(spaceId, name.trim());
     toast.success('Folder created');
-    setOpen(false);
-    setName('');
+    onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-7 w-full justify-start ml-6">
-          <FolderPlus className="h-3.5 w-3.5 mr-1" />
-          Add Folder
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-popover">
         <DialogHeader>
           <DialogTitle>Create New Folder</DialogTitle>
@@ -67,7 +65,7 @@ export function CreateFolderDialog({ spaceId, spaceName }: CreateFolderDialogPro
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button onClick={handleCreate}>Create Folder</Button>

@@ -1,15 +1,24 @@
-import { ChevronRight, FolderOpen, FileText } from 'lucide-react';
+import { ChevronRight, FolderOpen, FileText, FolderPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useDataStore } from '@/stores/useDataStore';
 import { useUIStore } from '@/stores/useUIStore';
 import { CreateSpaceDialog } from './CreateSpaceDialog';
 import { CreateFolderDialog } from './CreateFolderDialog';
 import { CreatePageDialog } from './CreatePageDialog';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from '@/components/ui/context-menu';
+import { useState } from 'react';
 
 export function SpacesTree() {
   const navigate = useNavigate();
   const { spaces } = useDataStore();
   const { leftExpanded, setLeftExpanded } = useUIStore();
+  const [folderDialogOpen, setFolderDialogOpen] = useState(false);
+  const [selectedSpace, setSelectedSpace] = useState<{ id: string; name: string } | null>(null);
 
   const toggleSpace = (spaceId: string) => {
     setLeftExpanded(spaceId, !leftExpanded[spaceId]);
@@ -17,6 +26,11 @@ export function SpacesTree() {
 
   const toggleFolder = (folderId: string) => {
     setLeftExpanded(folderId, !leftExpanded[folderId]);
+  };
+
+  const handleAddFolder = (spaceId: string, spaceName: string) => {
+    setSelectedSpace({ id: spaceId, name: spaceName });
+    setFolderDialogOpen(true);
   };
 
   return (
@@ -27,15 +41,25 @@ export function SpacesTree() {
         return (
           <div key={space.id} className="space-y-1">
             {/* Space */}
-            <button
-              onClick={() => toggleSpace(space.id)}
-              className="flex items-center gap-2 w-full px-2 py-1.5 rounded-md hover:bg-sidebar-hover text-sm text-sidebar-foreground transition-colors"
-            >
-              <ChevronRight
-                className={`h-4 w-4 transition-transform ${spaceExpanded ? 'rotate-90' : ''}`}
-              />
-              <span className="font-medium truncate">{space.name}</span>
-            </button>
+            <ContextMenu>
+              <ContextMenuTrigger asChild>
+                <button
+                  onClick={() => toggleSpace(space.id)}
+                  className="flex items-center gap-2 w-full px-2 py-1.5 rounded-md hover:bg-sidebar-hover text-sm text-sidebar-foreground transition-colors"
+                >
+                  <ChevronRight
+                    className={`h-4 w-4 transition-transform ${spaceExpanded ? 'rotate-90' : ''}`}
+                  />
+                  <span className="font-medium truncate">{space.name}</span>
+                </button>
+              </ContextMenuTrigger>
+              <ContextMenuContent className="bg-popover">
+                <ContextMenuItem onClick={() => handleAddFolder(space.id, space.name)}>
+                  <FolderPlus className="h-4 w-4 mr-2" />
+                  Add Folder
+                </ContextMenuItem>
+              </ContextMenuContent>
+            </ContextMenu>
 
             {/* Folders */}
             {spaceExpanded && (
@@ -81,7 +105,6 @@ export function SpacesTree() {
                     </div>
                   );
                 })}
-                <CreateFolderDialog spaceId={space.id} spaceName={space.name} />
               </div>
             )}
           </div>
@@ -89,6 +112,15 @@ export function SpacesTree() {
       })}
 
       <CreateSpaceDialog />
+      
+      {selectedSpace && (
+        <CreateFolderDialog 
+          spaceId={selectedSpace.id} 
+          spaceName={selectedSpace.name}
+          open={folderDialogOpen}
+          onOpenChange={setFolderDialogOpen}
+        />
+      )}
     </div>
   );
 }
