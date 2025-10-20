@@ -1,6 +1,6 @@
 import { Lock, ChevronDown, ChevronRight, GripVertical, MoreVertical } from 'lucide-react';
 import { NavigateFunction } from 'react-router-dom';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
