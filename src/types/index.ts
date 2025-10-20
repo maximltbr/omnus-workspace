@@ -34,6 +34,7 @@ export interface Dataset {
 export interface PageNode {
   id: ID;
   name: string;
+  content?: string;
   lastModified?: string;
 }
 

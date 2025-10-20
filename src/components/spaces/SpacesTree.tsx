@@ -1,8 +1,10 @@
-import { ChevronRight, FolderOpen, FileText, Plus } from 'lucide-react';
+import { ChevronRight, FolderOpen, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { useDataStore } from '@/stores/useDataStore';
 import { useUIStore } from '@/stores/useUIStore';
+import { CreateSpaceDialog } from './CreateSpaceDialog';
+import { CreateFolderDialog } from './CreateFolderDialog';
+import { CreatePageDialog } from './CreatePageDialog';
 
 export function SpacesTree() {
   const navigate = useNavigate();
@@ -69,21 +71,24 @@ export function SpacesTree() {
                               <span className="truncate">{page.name}</span>
                             </button>
                           ))}
+                          <CreatePageDialog 
+                            spaceId={space.id} 
+                            folderId={folder.id}
+                            folderName={folder.name}
+                          />
                         </div>
                       )}
                     </div>
                   );
                 })}
+                <CreateFolderDialog spaceId={space.id} spaceName={space.name} />
               </div>
             )}
           </div>
         );
       })}
 
-      <Button variant="outline" size="sm" className="w-full mt-2">
-        <Plus className="h-4 w-4 mr-1" />
-        New Space
-      </Button>
+      <CreateSpaceDialog />
     </div>
   );
 }

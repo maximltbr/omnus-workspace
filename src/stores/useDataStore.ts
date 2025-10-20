@@ -7,6 +7,7 @@ interface DataStore {
   addSpace: (name: string) => void;
   addFolder: (spaceId: ID, name: string) => void;
   addPage: (spaceId: ID, folderId: ID, name: string) => void;
+  updatePage: (pageId: ID, updates: Partial<{ name: string; content: string }>) => void;
   getSpace: (id: ID) => SpaceNode | undefined;
   getPage: (id: ID) => { space: SpaceNode; folder: any; page: any } | undefined;
   addDataset: (dataset: Omit<Dataset, 'id' | 'audit'>) => void;
@@ -15,7 +16,47 @@ interface DataStore {
   getDataset: (id: ID) => Dataset | undefined;
 }
 
-const initialSpaces: SpaceNode[] = [];
+const initialSpaces: SpaceNode[] = [
+  {
+    id: 'space-1',
+    name: 'Marketing',
+    expanded: true,
+    folders: [
+      {
+        id: 'folder-1',
+        name: 'Campaigns',
+        expanded: true,
+        pages: [
+          {
+            id: 'page-1',
+            name: 'Q1 Campaign Strategy',
+            content: '<h1>Q1 Campaign Strategy</h1><p>Welcome to your first page! Start typing to add content...</p>',
+            lastModified: new Date().toISOString(),
+          },
+          {
+            id: 'page-2',
+            name: 'Social Media Plan',
+            content: '',
+            lastModified: new Date().toISOString(),
+          },
+        ],
+      },
+      {
+        id: 'folder-2',
+        name: 'Analytics',
+        expanded: false,
+        pages: [
+          {
+            id: 'page-3',
+            name: 'Monthly Report',
+            content: '',
+            lastModified: new Date().toISOString(),
+          },
+        ],
+      },
+    ],
+  },
+];
 
 const initialDatasets: Dataset[] = [];
 
@@ -69,6 +110,7 @@ export const useDataStore = create<DataStore>((set, get) => ({
                         {
                           id: `page-${Date.now()}`,
                           name,
+                          content: '',
                           lastModified: new Date().toISOString(),
                         },
                       ],
@@ -78,6 +120,26 @@ export const useDataStore = create<DataStore>((set, get) => ({
             }
           : space
       ),
+    }));
+  },
+  
+  updatePage: (pageId, updates) => {
+    set((state) => ({
+      spaces: state.spaces.map((space) => ({
+        ...space,
+        folders: space.folders.map((folder) => ({
+          ...folder,
+          pages: folder.pages.map((page) =>
+            page.id === pageId
+              ? {
+                  ...page,
+                  ...updates,
+                  lastModified: new Date().toISOString(),
+                }
+              : page
+          ),
+        })),
+      })),
     }));
   },
   
