@@ -15,89 +15,9 @@ interface DataStore {
   getDataset: (id: ID) => Dataset | undefined;
 }
 
-// Mock data for demo
-const initialSpaces: SpaceNode[] = [
-  {
-    id: 'space-1',
-    name: 'Q1 2025 Planning',
-    expanded: true,
-    folders: [
-      {
-        id: 'folder-1',
-        name: 'Revenue Forecasts',
-        expanded: true,
-        pages: [
-          { id: 'page-1', name: 'Product Revenue', lastModified: '2025-01-15' },
-          { id: 'page-2', name: 'Regional Breakdown', lastModified: '2025-01-14' },
-        ],
-      },
-      {
-        id: 'folder-2',
-        name: 'Expense Planning',
-        pages: [
-          { id: 'page-3', name: 'Headcount Model', lastModified: '2025-01-10' },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'space-2',
-    name: 'Annual Budget 2025',
-    folders: [
-      {
-        id: 'folder-3',
-        name: 'Departmental Budgets',
-        pages: [
-          { id: 'page-4', name: 'Engineering', lastModified: '2024-12-20' },
-          { id: 'page-5', name: 'Sales & Marketing', lastModified: '2024-12-18' },
-        ],
-      },
-    ],
-  },
-];
+const initialSpaces: SpaceNode[] = [];
 
-const initialDatasets: Dataset[] = [
-  {
-    id: 'ds-1',
-    name: 'CRM Opportunities',
-    source: 'NetSuite',
-    type: 'transactional',
-    environment: 'CRM',
-    automation: { enabled: true, status: 'ok' },
-    audit: { updatedAt: '2025-01-15T10:30:00Z', updatedBy: 'john@company.com' },
-    restricted: false,
-  },
-  {
-    id: 'ds-2',
-    name: 'Headcount Snapshot',
-    source: 'Rippling',
-    type: 'snapshot',
-    environment: 'Headcount',
-    automation: { enabled: true, status: 'ok' },
-    audit: { updatedAt: '2025-01-15T08:00:00Z', updatedBy: 'hr@company.com' },
-    restricted: true,
-  },
-  {
-    id: 'ds-3',
-    name: 'Financial Actuals',
-    source: 'Sage Intacct',
-    type: 'transactional',
-    environment: 'ERP',
-    automation: { enabled: true, status: 'stale' },
-    audit: { updatedAt: '2025-01-10T14:22:00Z', updatedBy: 'finance@company.com' },
-    restricted: false,
-  },
-  {
-    id: 'ds-4',
-    name: 'Revenue Dashboard',
-    source: 'Looker',
-    type: 'snapshot',
-    environment: 'BI',
-    automation: { enabled: false, status: 'ok' },
-    audit: { updatedAt: '2025-01-14T16:45:00Z', updatedBy: 'analyst@company.com' },
-    restricted: false,
-  },
-];
+const initialDatasets: Dataset[] = [];
 
 export const useDataStore = create<DataStore>((set, get) => ({
   spaces: initialSpaces,
