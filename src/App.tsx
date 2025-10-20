@@ -13,9 +13,20 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-function AppContent() {
+function AppRoutes() {
   useKeyboardShortcuts();
-  return null;
+  
+  return (
+    <Routes>
+      <Route element={<AppShell />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/page/:pageId" element={<PageView />} />
+        <Route path="/data" element={<DataCatalog />} />
+        <Route path="/data/:datasetId" element={<DatasetDetails />} />
+      </Route>
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
 }
 
 const App = () => (
@@ -24,16 +35,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AppContent />
-        <Routes>
-          <Route element={<AppShell />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/page/:pageId" element={<PageView />} />
-            <Route path="/data" element={<DataCatalog />} />
-            <Route path="/data/:datasetId" element={<DatasetDetails />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AppRoutes />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
