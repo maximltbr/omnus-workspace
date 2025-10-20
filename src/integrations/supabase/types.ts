@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      datasets: {
+        Row: {
+          automation_enabled: boolean
+          automation_status: string
+          created_at: string
+          data: Json | null
+          environment: string
+          id: string
+          name: string
+          restricted: boolean
+          source: string
+          type: string
+          updated_at: string
+          updated_by: string
+          user_id: string
+        }
+        Insert: {
+          automation_enabled?: boolean
+          automation_status?: string
+          created_at?: string
+          data?: Json | null
+          environment: string
+          id?: string
+          name: string
+          restricted?: boolean
+          source: string
+          type: string
+          updated_at?: string
+          updated_by: string
+          user_id: string
+        }
+        Update: {
+          automation_enabled?: boolean
+          automation_status?: string
+          created_at?: string
+          data?: Json | null
+          environment?: string
+          id?: string
+          name?: string
+          restricted?: boolean
+          source?: string
+          type?: string
+          updated_at?: string
+          updated_by?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

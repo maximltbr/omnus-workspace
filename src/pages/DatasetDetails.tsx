@@ -5,13 +5,28 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useDataStore } from '@/stores/useDataStore';
+import { useEffect } from 'react';
 
 export default function DatasetDetails() {
   const { datasetId } = useParams<{ datasetId: string }>();
   const navigate = useNavigate();
-  const { datasets } = useDataStore();
+  const { datasets, loading, fetchDatasets } = useDataStore();
+
+  useEffect(() => {
+    if (datasets.length === 0) {
+      fetchDatasets();
+    }
+  }, [datasets.length, fetchDatasets]);
 
   const dataset = datasets.find((ds) => ds.id === datasetId);
+
+  if (loading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   if (!dataset) {
     return (

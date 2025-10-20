@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { AddDataPopover } from '@/components/data/AddDataPopover';
@@ -9,10 +9,16 @@ export default function DataCatalog() {
   const navigate = useNavigate();
   const {
     datasets,
+    loading,
+    fetchDatasets,
     deleteDataset,
     updateDataset
   } = useDataStore();
   const [popoverOpen, setPopoverOpen] = useState(false);
+
+  useEffect(() => {
+    fetchDatasets();
+  }, [fetchDatasets]);
   const handleDelete = (id: string, name: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (confirm(`Delete dataset "${name}"?`)) {
@@ -37,6 +43,14 @@ export default function DataCatalog() {
     });
     toast.success(restricted ? 'Access opened' : 'Access restricted');
   };
+  if (loading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return <div className="h-full p-6 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
