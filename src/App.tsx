@@ -4,11 +4,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppShell } from "./components/layout/AppShell";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import Home from "./pages/Home";
 import PageView from "./pages/PageView";
 import DataCatalog from "./pages/DataCatalog";
 import DatasetDetails from "./pages/DatasetDetails";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -18,7 +20,8 @@ function AppRoutes() {
   
   return (
     <Routes>
-      <Route element={<AppShell />}>
+      <Route path="/auth" element={<Auth />} />
+      <Route element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
         <Route path="/" element={<Home />} />
         <Route path="/page/:pageId" element={<PageView />} />
         <Route path="/data" element={<DataCatalog />} />
