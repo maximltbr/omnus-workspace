@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -8,7 +7,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -23,8 +21,13 @@ import { useDataStore } from '@/stores/useDataStore';
 import { toast } from 'sonner';
 import type { SourceSystem, DatasetType, Environment } from '@/types';
 
-export function CreateDatasetDialog() {
-  const [open, setOpen] = useState(false);
+interface CreateDatasetDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  children: React.ReactNode;
+}
+
+export function CreateDatasetDialog({ open, onOpenChange, children }: CreateDatasetDialogProps) {
   const [name, setName] = useState('');
   const [source, setSource] = useState<SourceSystem>('Excel');
   const [type, setType] = useState<DatasetType>('snapshot');
@@ -47,18 +50,13 @@ export function CreateDatasetDialog() {
     });
 
     toast.success('Dataset created successfully');
-    setOpen(false);
+    onOpenChange(false);
     setName('');
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Create Dataset
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {children}
       <DialogContent className="bg-popover">
         <DialogHeader>
           <DialogTitle>Create New Dataset</DialogTitle>
@@ -127,7 +125,7 @@ export function CreateDatasetDialog() {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button onClick={handleCreate}>Create Dataset</Button>

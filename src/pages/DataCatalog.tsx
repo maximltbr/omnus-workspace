@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { Plus, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CreateDatasetDialog } from '@/components/data/CreateDatasetDialog';
 import { UploadDataDialog } from '@/components/data/UploadDataDialog';
@@ -11,6 +11,8 @@ import { toast } from 'sonner';
 export default function DataCatalog() {
   const navigate = useNavigate();
   const { datasets, deleteDataset, updateDataset } = useDataStore();
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
 
   const handleDelete = (id: string, name: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -39,10 +41,20 @@ export default function DataCatalog() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Datasets</h1>
-        <Button variant="ghost" className="text-primary hover:text-primary">
-          <Plus className="h-4 w-4 mr-1" />
-          Create dataset
-        </Button>
+        <div className="flex gap-2">
+          <UploadDataDialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
+            <Button variant="ghost" className="text-primary hover:text-primary">
+              <Upload className="h-4 w-4 mr-1" />
+              Upload data
+            </Button>
+          </UploadDataDialog>
+          <CreateDatasetDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+            <Button variant="ghost" className="text-primary hover:text-primary">
+              <Plus className="h-4 w-4 mr-1" />
+              Create dataset
+            </Button>
+          </CreateDatasetDialog>
+        </div>
       </div>
 
       {/* Data Table */}
@@ -53,12 +65,6 @@ export default function DataCatalog() {
         toggleAutomation={toggleAutomation}
         toggleRestricted={toggleRestricted}
       />
-
-      {/* Add Section Button */}
-      <Button variant="ghost" className="text-primary hover:text-primary">
-        <Plus className="h-4 w-4 mr-1" />
-        Add section
-      </Button>
     </div>
   );
 }
