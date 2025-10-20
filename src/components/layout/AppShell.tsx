@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import { TopBar } from './TopBar';
 import { LeftSidebar } from './LeftSidebar';
 import { RightSidebar } from './RightSidebar';
 import { useUIStore } from '@/stores/useUIStore';
@@ -66,9 +65,7 @@ export function AppShell() {
   };
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-hidden bg-background">
-      <TopBar />
-      
+    <div className="flex h-screen w-full overflow-hidden bg-background">
       <div className="flex flex-1 overflow-hidden relative">
         {/* Left Sidebar */}
         <div
