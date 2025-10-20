@@ -3,10 +3,20 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import { AppShell } from "./components/layout/AppShell";
+import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
+import Home from "./pages/Home";
+import PageView from "./pages/PageView";
+import DataCatalog from "./pages/DataCatalog";
+import DatasetDetails from "./pages/DatasetDetails";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+
+function AppContent() {
+  useKeyboardShortcuts();
+  return null;
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -14,9 +24,14 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <AppContent />
         <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route element={<AppShell />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/page/:pageId" element={<PageView />} />
+            <Route path="/data" element={<DataCatalog />} />
+            <Route path="/data/:datasetId" element={<DatasetDetails />} />
+          </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
