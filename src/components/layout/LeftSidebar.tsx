@@ -16,7 +16,7 @@ export function LeftSidebar() {
       {/* Header with Pin */}
       <div className="flex items-center justify-between p-3 border-b border-sidebar-border">
         
-        <Button variant="ghost" size="icon" onClick={toggleLeftPin} className={`h-7 w-7 pin-button ${leftPinned ? 'text-primary' : 'text-muted-foreground'}`} title="Pin sidebar (P)">
+        <Button variant="ghost" size="icon" onClick={toggleLeftPin} className="h-7 w-7 pin-button text-foreground" title="Pin sidebar (P)">
           <svg className="h-4 w-4" viewBox="0 0 23.3887 17.9785" xmlns="http://www.w3.org/2000/svg">
             <g>
               <rect height="17.9785" opacity="0" width="23.3887" x="0" y="0" />
